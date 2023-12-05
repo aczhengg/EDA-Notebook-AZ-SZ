@@ -23,4 +23,8 @@ In terms of visualizations, we created bar graphs in RStudio; these were especia
 
 Challenges we currently face involve questions about the generalizeability of our data, rooted in the data's nature as a voluntary survey, which could have introduced selection bias, and the lack of longevity of each cohort study. Next steps we would want to study include looking at pre-COVID19 and post-COVID19 data to understand the impact of global health policies as well as diving deeper into nursing home funding disparities; for instance, one direction we could be interested in is looking at how less financially stable, rural areas compare to more financially well off, urban areas in terms of their nursing home care quality. 
 
+## Instructions for Getting Started
+1. Clone this repository
+2. Download both "ICPSR_37969 5/DS0001/37969-0001-Data.csv" and "ICPSR_37969 6/DS0002/37969-0002-Data.csv". These are the two datasets we used for this project; the first is 2017 data and the second is 2019 data. 
+3. Download "EDA Notebook Final" to view our analysis
 
