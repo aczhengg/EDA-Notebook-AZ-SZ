@@ -1,0 +1,860 @@
+---
+output: 
+  html_document:
+    css: styles.css
+---
+
+## Examining the U.S. Nursing Home Experience by Demographics: A Landscape Analysis from the Perspectives of Current Residents and Family Members 
+
+#### Ali Zheng, Stella Zhang 
+
+
+### INTRODUCTION
+The United States has been witnessing a substantial increase in its aging population due to improved life expectancies and the baby boom post-World War II. The population aged 65 and over grew nearly five times faster than the total population over a century, from 1920 to 2020, according to the 2020 Census. [1] The number of older adults has reached 55.8 million, making up 16.8% of the country’s total population. [2] Now is the time for the public health community to address the needs of this extensive demographic, as aging is associated with a range of health challenges. Sensory loss, reduced immune function, cardiovascular diseases, osteoporosis, dementia, and many chronic illnesses are common, and intense caregiver support is needed. [3] There is, however, a crisis in long-term care, as the number of care recipients is rising while the number of caregivers is diminishing. Data from the U.S. Census data reveals that about 1 in 11 Americans age 50 and older lacks a spouse, a partner, or a living child. This issue is expected to exacerbate due to declining marriage rates and a trend of having fewer children. [4]
+
+Nursing homes, as a vital component of the healthcare continuum, play a multi-faceted role in both protecting those that require extensive, all-encompassing treatment of existing conditions while also providing protective measures to residents to prevent the development of new conditions. Nursing home care is associated with shorter hospital stays and lower hospital costs and has been reported to improve patients’ health and quality of life and lower rates of unplanned readmissions. [5]  Given the importance of nursing homes, this study aims to monitor the quality and accessibility of such care. We want to identify the key factors that influence residents' perception of nursing home care and how the perceived quality of nursing home care in the United States has changed between 2017 and 2019. We are also studying whether there are significant/notable differences in nursing home satisfaction across demographics such as sex, race, age, income level, and source of funding (i.e. private insurance, Medicare, ..).
+
+### LITERATURE REVIEW 
+Prior to the passing of Medicare and Medicaid, 2 government funded programs, in 1965, nursing homes were largely privately owned and managed, with few standard regulation rules regarding quality of provided care spanning across them. Thus, the creation of them rapidly expanded the industry and led to a significant improvement in quality of care provided to nursing home residents. 
+
+In 1985, Donabedian, who was considered the father of quality assurance, introduced the SPO method [6]. His theory assessed quality through (S) structures, (P) processes, and (O) outcomes. Structural measures are physical, organizational indicators that reflect on the service/provider. Process measures assess how well current structured systems and processes deliver the desired results, which in this case are how satisfied nursing home residents are with the standard of care. Outcome measures refer to the attainment of more long-term goals, such as reduced mortality rates, reduced length of stay, reduced incidents, etc. 
+
+Castle also conducted a study focused on family satisfaction with the care provided to the resident [7], which aids in the problem highlighted at the beginning of his study; with more than 800,000 elders entering nursing homes each year (2004), there’s a high likelihood that they may be unable to properly judge quality indicators and make informed choices about their residency. Thus, this study emphasizes the need for family member input to create a holistically positive and well-suited environment for nursing home residents, which can explain the consistently positive quality ratings observed in our research. 
+
+Mor et al. studies how federal vs. private payment means were correlated with staffing troubles and financial support in nursing homes [8]. Facilities that serve predominantly Medicaid patients tend to be located in poorer communities and have a lower nurse to patient ratio compared to facilities in a higher financial tier. The likelihood of Medicare or Medicaid program termination was nearly twice as high among facilities in a lower financial tier compared to upper-tier facilities. Frequent changes in ownership of facilities was also observed at a higher rate in lower-tier facilities. These both may be signals of financial or managerial difficulties, which may have an effect on quality ratings that we would want to explore further. 
+
+These articles support and emphasize our understanding of nursing home history, the evolution of their standards for care, and how family influence may affect quality ratings. It also raises the potential for our data to explore how differences in payment methods can be indicative of facility financial support and correlate to differences in quality ratings. Our data aims to provide a more extensive look into how family-supported nursing home care perceived quality of care and how distribution of financial support across facilities may subsequently affect quality ratings. We will also explore whether patient demographic is indicative of any significant differences across contentment with nursing home care.
+
+
+### METHODS
+**Choice of Dataset**
+
+This study uses primary data collected from an Internet-based survey administered nationally to qualified individuals with recent nursing home experience in 2017 and 2019.  Having two cohorts provides a unique opportunity to compare and contrast the environments of nursing home care across two separate time periods. The eligibility criteria of participants is identical across both, including 1) being 18 years of age or older 2) having either currently or within the past 6 months live in a nursing home, or 3) having a family member currently or within the past 6 months live in a nursing home. Residents and family members were recruited from the Survey Sampling International (SSI) multimillion-member US online panel. Participants from each year are exclusive, meaning a respondent in one cohort was not included in the other cohort. The survey elicited responses regarding demographics, health status, economic status, and quality of nursing homes. Each participant was asked to rank each factor on a scale from 0 (extremely poor) to 10 (extremely high). This allows for a quantitative assessment of these factors, allowing us to compare and contrast the participant insight and identify factors that play the most significant role in determining resident satisfaction.
+
+**Data Cleaning**
+
+There are two original datasets - one for the 2017 cohort and another for the 2019 cohort. The 2017 data contains 4536 observations and 175 variables, while the 2019 data has 3801 observations and 181 variables. The R packages used are tidyverse for data cleaning and visualization, as well as kableExtra for producing tables in R Markdown. 
+
+```{r}
+# Load Packages 
+library(tidyverse)
+library(kableExtra)
+library(broom)
+```
+
+```{r}
+#Import data
+cohort1 <- read.csv ("data/37969-0001-Data.csv", header=T, sep="\t")
+cohort2  <- read.csv ("data/37969-0002-Data.csv", header=T, sep="\t")
+```
+
+
+In the initial phase of data preparation, we extracted a subset of each cohort with only variables of interest. Since the main objective of this study was to assess nursing home quality and demographics, only survey questions related to these thematic areas were kept for further analysis. Some important variables included were food quality, cleanliness, physical environment, social environment, staff attentiveness to residents, and routine medical care. 
+
+
+```{r}
+#Create subsets with only variables of interest
+cohort17 <- cohort1%>%
+  select(Q101,Q102,Q106,Q108,Q109,Q203,Q205,Q205B,
+         Q301B,Q602_1,Q602_6,Q602_2,Q602_3,Q602_4,Q602_5,Q602_6,Q602_7,Q602_8,Q602_9,Q602_10, Q602_11, Q602_12,
+         Q1106B1,Q305,Q303)
+#Preview Data
+cohort17 %>%
+  head() %>%
+  kable() %>%
+   row_spec(0, extra_css = "border-bottom: 2px solid black") %>%
+  kable_styling(latex_options = "scale_down", full_width = FALSE, position = "center")
+
+cohort19 <- cohort2%>%
+  select(Q101,Q102,Q106,Q108,Q109,Q203,Q205,Q205B,
+         Q301B,Q602_1,Q602_6,Q602_2,Q602_3,Q602_4,Q602_5,Q602_6,Q602_7,Q602_8,Q602_9,Q602_10, Q602_11, Q602_12,
+         Q1106B1,Q305,Q303)
+#Preview Data
+cohort19 %>%
+  head() %>%
+  kable()%>%
+   row_spec(0, extra_css = "border-bottom: 2px solid black") %>%
+  kable_styling(latex_options = "scale_down", full_width = FALSE, position = "center")
+
+```
+
+
+The second step of data preparation involvs renaming of variables. The original names of all variables consist of a letter and a number, indicating their sequence in the survey. To facilitate the understanding of data during analysis, all variable names were changed to better reflect the meaning behind each survey question. For example, the original variable “Q101” was changed to “participant_gender”. 
+
+
+```{r}
+#Rename variables to more meaningful names
+cohort17 <- cohort17%>%
+  rename(participant_gender=Q101,
+           participant_birthyear=Q102,
+           education_level=Q106,
+           race=Q108,
+           income_level=Q109,
+           nursinghome_pt6mo=Q203,
+           nursinghome_familytype=Q205,
+           nursinghome_familygender=Q205B,
+           quality_familiarity=Q301B,
+           quality_food=Q602_1,
+           quality_cleanliness=Q602_2,
+           quality_physicalenvironment=Q602_3,
+           quality_security=Q602_4,
+           quality_socialenvironment=Q602_5,
+           quality_activities=Q602_6,
+           quality_personalcare=Q602_7,
+           quality_attentiveness=Q602_8,
+           quality_comm_resident=Q602_9,
+           quality_comm_family=Q602_10,
+           quality_medical=Q602_11,
+           quality_emergencymedical=Q602_12,
+           payment_source=Q1106B1,
+           visit_traveltime=Q305,
+           visit_frequency=Q303)
+
+cohort19 <- cohort19%>%
+  rename(participant_gender=Q101,
+           participant_birthyear=Q102,
+           education_level=Q106,
+           race=Q108,
+           income_level=Q109,
+           nursinghome_pt6mo=Q203,
+           nursinghome_familytype=Q205,
+           nursinghome_familygender=Q205B,
+           quality_familiarity=Q301B,
+           quality_food=Q602_1,
+           quality_cleanliness=Q602_2,
+           quality_physicalenvironment=Q602_3,
+           quality_security=Q602_4,
+           quality_socialenvironment=Q602_5,
+           quality_activities=Q602_6,
+           quality_personalcare=Q602_7,
+           quality_attentiveness=Q602_8,
+           quality_comm_resident=Q602_9,
+           quality_comm_family=Q602_10,
+           quality_medical=Q602_11,
+           quality_emergencymedical=Q602_12,
+           payment_source=Q1106B1,
+           visit_traveltime=Q305,
+           visit_frequency=Q303)
+
+```
+
+
+Next, to better compare the two cohorts and analyze changes over time, the two separate datasets were combined into one. Doing so required two steps. Firstly, a new variable called “year” was attached to the end of each dataset, indicating either 2017 or 2019 accordingly. After elongating the datasets horizontally, they were then stacked vertically and combined into a single dataset. 
+
+
+```{r}
+#Add new "year" column with appropriate value 
+cohort17 <- cohort17%>%
+  mutate(year=factor("2017"))
+cohort19 <- cohort19%>%
+  mutate(year=factor("2019"))
+
+#same variables so can directly apply rbind 
+df <- rbind(cohort17,cohort19)
+
+#Check final dataset's number of observations (4536+3801=8337)
+nrow(cohort17)
+nrow(cohort19)
+nrow(df)
+
+df %>%
+  head() %>%
+  kable() %>%
+  row_spec(0, extra_css = "border-bottom: 2px solid black") %>%
+  kable_styling(latex_options = "scale_down", full_width = FALSE, position = "center")
+
+```
+
+
+In summary, the final dataset for this study contains 8337 observations and 25 variables of interest with survey responses from both 2017 and 2019. 
+
+
+**Data Analysis**
+
+Analysis of this study is threefold: participant demographics, nursing home experience, and accessibility of facilities. Participant demographics provide important insight into the populations more or less accessible to nursing homes in the U.S. The frequency of each demographic variable, including age, income, education, and race, was calculated, and bar graphs were made using ggplot. Similarly, nursing home experience was also analyzed using a descriptive approach, where frequencies were taken for scores (1-10) that participants gave to each metric. Variables include food quality, cleanliness, security, etc. Bar graphs were made with 2017 and 2019 data placed side by side for comparison. The accessibility of facilities was measured based on payment sources and the visit frequency of family members. Participants who paid through Medicare are filtered into a subgroup, and their specific scores are compared with the average of all payment groups to investigate whether perceived quality is different compared to the rest of the participants. 
+
+
+
+### RESULTS
+**Participant Demographics**
+
+**1. Gender Distribution of All Nursing Home Residents (including those whose family member participated in survey)**
+```{r}
+resident_gender <- df %>%
+  filter(!is.na(nursinghome_familygender)) %>% 
+  group_by(nursinghome_familygender, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+resident_gender <- resident_gender %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(resident_gender, aes(x = factor(nursinghome_familygender), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), vjust = -0.5, size = 3, position = position_dodge2(width = 0.9)) + 
+  labs(
+    title = "Nursing Home Resident Gender Distribution",
+    x = "Gender",
+    y = "Percentage",
+    fill = "Year",
+  ) +
+  scale_x_discrete(labels = c("Male", "Female")) +
+  theme(legend.position = "bottom") + 
+  theme_minimal() +
+  theme(legend.title = element_blank(), axis.text.x = element_text( hjust = 1))
+
+```
+
+This graph depicts the genders of all nursing home residents (who chose, or family chose, to participate in this factor of the survey) from both cohort years. The number of females, 4644, and males, 1964, account for 79% of all respondents of the survey across both years 2017 and 2019 (8,337). The number of female participants are greater than the number of male participants.
+
+
+**2. Education Level Distribution for All Participants**
+```{r}
+education <- df %>%
+  filter(!is.na(education_level)) %>% 
+  group_by(education_level, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+education <- education %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(education, aes(x = factor(education_level), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), vjust = -0.5, size = 3, position = position_dodge2(width = 0.9)) + 
+  labs(
+    title = "Highest Education Level Distribution",
+    x = "Highest Education Level",
+    y = "Percentage",
+    fill = "Year",
+  ) +
+  scale_x_discrete(labels = c("Less than high school", "Some high school", "High school", "Some college", "Associate degree", "College degree", "Some graduate school", "Masters degree", "Professional degree")) +
+  theme(legend.position = "bottom") + 
+  theme_minimal() +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+This graph shows that the most education level among survey participants across both cohort years, 2017 and 2019, is a college degree, and the least common education level to have stopped schooling before high school. This suggests that, on average, those interacting with nursing homes tend to have a relatively high level of education.
+
+
+**3. Race Distribution for All Participants**
+```{r}
+# Filter out missing data
+racedf <- df %>%
+  filter(!is.na(race)) 
+
+# Group by race and year and calculate counts within each year
+racedf <- racedf %>%
+  group_by(race, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+racedf <- racedf %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(racedf, aes(x = factor(race), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), vjust = -0.5, size = 3, position = position_dodge2(width = 0.9)) + 
+  labs(
+    title = "Racial Distribution",
+    x = "Race",
+    y = "Percentage",
+    fill = "Year",
+  ) +
+  scale_x_discrete(labels = c("White", "Black or African American", "Asian or Pacific Islander", "Native American or Alaska Native", "Mixed Racial Background", "Other Race", "Prefer Not to Answer")) + 
+  theme_minimal() +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+The most prevalent race, by far, of these survey participants is White.
+
+
+**4. Income Distribution for All Participants**
+```{r}
+# Filter out missing data
+income <- df %>%
+  filter(!is.na(income_level)) 
+
+# Group by income and year and calculate counts within each year
+income <- income %>%
+  group_by(income_level, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+income <- income %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(income, aes(x = factor(income_level), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), vjust = -0.5, size = 3, position = position_dodge2(width = 0.9)) + 
+  labs(
+    title = "Income Distribution",
+    x = "Income",
+    y = "Percentage",
+    fill = "Income",
+  ) +
+  scale_x_discrete(labels = c("< $30k", "$30k-50k", "$50k-70k","$70k-100k","$100k-150k","$150k-200k", "$200k-250k","$250k+","Prefer Not to Answer"))+
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+This income distribution suggests that most survey participants interacting with nursing homes make an annual income of less than $100K. The graph seems to have a right skew, with the highest bracket of income level in these cohorts is $50K - $70K.
+
+
+
+**Nursing Home Experience by Year**
+
+**1. Food Quality**
+```{r}
+mean(df$quality_food)
+
+food <- df %>%
+   filter(!is.na(quality_food)) %>% 
+  group_by(quality_food, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+food <- food %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(food, aes(x = factor(quality_food), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), vjust = -0.5, size = 3, position = position_dodge2(width = 0.9)) + 
+   labs(
+    title = "Food Quality Rating By Year",
+    x = "Score",
+    y = "Percentage",
+    fill = "Year",
+  ) +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+The trends of the 2 graphs of 2017 and 2019 cohorts follow the same left skew shape. The most common answer for the 2017 cohort for the food quality assessment is an 8. The most common answer for the 2019 cohort for the food quality assessment is an 8.
+
+
+**2. Cleanliness** 
+```{r}
+mean(df$quality_cleanliness)
+
+clean <- df %>%
+   filter(!is.na(quality_cleanliness)) %>% 
+  group_by(quality_cleanliness, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+clean <- clean %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(clean, aes(x = factor(quality_cleanliness), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), size = 3, vjust = -0.5, position = position_dodge2(width = 0.9))
+   labs(
+    title = "Cleanliness Rating By Year",
+    x = "Score",
+    y = "Percentage",
+    fill = "Year",
+  ) +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+The most common cleanliness rating in the 2017 cohort is 8 with 973 votes, with the rating of 10 right behind it with 969 votes. In the 2019 cohort, 8 is the most common rating at 872 votes The number of 10 votes compared to number of 8 votes decreases from 2017 to 2019.
+
+
+**3. Quality of Physical Environment**
+```{r}
+mean(df$quality_physicalenvironment)
+
+
+physical <- df %>%
+   filter(!is.na(quality_physicalenvironment)) %>% 
+  group_by(quality_physicalenvironment, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+physical <- physical %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(physical, aes(x = factor(quality_physicalenvironment), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), size = 3, vjust = -0.5, position = position_dodge2(width = 0.9))
+   labs(
+    title = "Quality of Physical Environment Rating By Year",
+    x = "Score",
+    y = "Percentage",
+    fill = "Year",
+  ) +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+The quality of physical environment in 2017 had a most common rating of 8, as did the quality of physical environment in 2019.
+
+
+**4. Security **
+```{r}
+mean(df$quality_security)
+
+security <- df %>%
+   filter(!is.na(quality_security)) %>% 
+  group_by(quality_security, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+security <- security %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(security, aes(x = factor(quality_security), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), size = 3, vjust = -0.5, position = position_dodge2(width = 0.9))
+   labs(
+    title = "Security Rating By Year",
+    x = "Score",
+    y = "Percentage",
+    fill = "Year",
+  ) +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+The most common security environment quality response among the nursing home surveyed cohorts in 2017 was a 10. We see a decrease in proportion in 2019, with the most common rating at an 8.
+
+
+**5. Quality of Social Environment**
+```{r}
+mean(df$quality_socialenvironment)
+
+social <- df %>%
+   filter(!is.na(quality_socialenvironment)) %>% 
+  group_by(quality_socialenvironment, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+social <- social %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(social, aes(x = factor(quality_socialenvironment), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), size = 3, vjust = -0.5, position = position_dodge2(width = 0.9))
+   labs(
+    title = "Quality of Social Environment Rating By Year",
+    x = "Score",
+    y = "Percentage",
+    fill = "Year",
+  ) +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+   
+```
+
+
+The quality of social environment average response was an 8, as was the response in the 2019 cohort survey.
+
+
+**6. Quality of Activities**
+```{r}
+mean(df$quality_activities)
+
+activities <- df %>%
+   filter(!is.na(quality_activities)) %>% 
+  group_by(quality_activities, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+activities <- activities %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(activities, aes(x = factor(quality_activities), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), size = 3, vjust = -0.5, position = position_dodge2(width = 0.9))
+  labs(
+    title = "Quality of Activity Rating By Year",
+    x = "Score",
+    y = "Count",
+    fill = "Year",
+  ) +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+The quality of activities average response among nursing home survey respondents was a rating of 8 in 2017, as was the quality of activities average response in 2019.
+
+
+**7. Quality of Personal Care**
+```{r}
+mean(df$quality_personalcare)
+
+care <- df %>%
+   filter(!is.na(quality_personalcare)) %>% 
+  group_by(quality_personalcare, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+care <- care %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(care, aes(x = factor(quality_personalcare), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), size = 3, vjust = -0.5, position = position_dodge2(width = 0.9))
+  labs(
+    title = "Quality of Personal Care Rating By Year",
+    x = "Score",
+    y = "Count",
+    fill = "Year",
+  ) +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+The quality of personal care average quality response for both cohorts is a rating of 8.
+
+
+**8. Quality of Medical Assistance**
+```{r}
+mean(df$quality_medical)
+
+medical <- df %>%
+   filter(!is.na(quality_medical)) %>% 
+  group_by(quality_medical, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+medical <- medical %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(medical, aes(x = factor(quality_medical), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), size = 3, vjust = -0.5, position = position_dodge2(width = 0.9))
+  labs(
+    title = "Quality of Medical Care Rating By Year",
+    x = "Score",
+    y = "Count",
+    fill = "Year",
+  ) +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+The quality of medical care average response for both 2017 and 2019 cohorts peaks at a quality rating of 8.
+
+
+
+**Nursing Home Accessibility**
+
+**1. Payment Sources**
+```{r}
+payment <- df %>%
+   filter(!is.na(payment_source)) %>% 
+  group_by(payment_source, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+payment <- payment %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(payment, aes(x = factor(payment_source), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), vjust = -0.5, size = 3, position = position_dodge2(width = 0.9)) + 
+  labs(
+   title = "Payment Source By Year",
+    x = "Score",
+    y = "Percent",
+    fill = "Year",
+  ) +
+  scale_x_discrete(labels = c("Medicaid", "Private Medical Insurance","Private Long Term Care Insurance","Medicare", "Out of Pocket","Don't Know"))+
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+The most common payment source for nursing home care in both 2017 and 2019 cohorts are private long term care insurance. The top three choices for both cohorts are the same (Private Long Term Care Insurance, Medicare, and Out of Pocket), however, the order changes from private long term care insurance, Medicare, and out of pocket being the order in 2017, and private long term care insurance, out of pocket payment, and Medicare being the order in 2019.
+
+
+
+**2. Visit Frequency**
+```{r}
+vfreq <- df %>%
+   filter(!is.na(visit_frequency)) %>% 
+  group_by(visit_frequency, year) %>%
+  summarise(Count = n())
+
+# Calculate the percentage within each year separately
+vfreq <- vfreq %>%
+  group_by(year) %>%
+  mutate(Percentage = (Count / sum(Count)) * 100)
+
+# Create a graph to visualize the distribution with side-by-side bars by year
+ggplot(vfreq, aes(x = factor(visit_frequency), y = Percentage, fill = factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = scales::percent(Percentage / 100)), vjust = -0.5, size = 3, position = position_dodge2(width = 0.9)) + 
+  labs(
+    title = "Visit Frequency By Year",
+    x = "Score",
+    y = "Count",
+    fill = "Year",
+  ) +
+  scale_x_discrete(labels = c("Almost never", "Less than once per month", "Less than weekly","Once a week","2-3 times a week","4-5 times a week","6+ times a week"))+
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+The most common visit frequency answer from survey respondents in both 2017 and 2019 cohorts in once a week. In the 2017 cohort, this is closely followed by the "Less than once per month" option, whereas the second most frequently chosen option in 2019 is "2-3 times a week".
+
+
+**Nursing Home Quality by Demographics**
+
+**1. By Payment Type (Private vs. Federal)**
+```{r}
+df <- df %>%
+  mutate(payment_type = case_when(
+    payment_source %in% c(2, 5) ~ "federal",
+    payment_source %in% c(3, 4) ~ "private",
+    TRUE ~ "other" 
+  ))
+
+# Reshape the data to a longer format
+your_data_filtered <- df %>%
+  filter(payment_type %in% c("federal", "private")) %>%
+  select(-quality_familiarity)  # Exclude the 'quality_familiarity' variable
+
+# Reshape the data to a longer format
+your_data_long <- your_data_filtered %>%
+  pivot_longer(cols = starts_with("quality_"), names_to = "quality_variable", values_to = "value")
+
+# Use ggplot to create the side-by-side bar plot
+ggplot(your_data_long, aes(x = quality_variable, y = value, fill = payment_type)) +
+  geom_bar(stat = "summary", fun = "mean", position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of Means by Payment Type",
+       x = "Measure of Quality",
+       y = "Mean Value") +
+  scale_fill_manual(values = c("federal" = "lightblue", "private" = "lightgreen")) +  # Adjust colors as needed
+  theme_minimal()+
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+# Perform t-tests for each quality variable
+t_test_results <- your_data_long %>%
+  group_by(quality_variable) %>%
+  summarise(p_value = t.test(value ~ payment_type)$p.value)
+
+# Combine the results with the mean values
+summary_table <- your_data_long %>%
+  group_by(quality_variable, payment_type) %>%
+  summarise(mean_value = mean(value)) %>%
+  pivot_wider(names_from = payment_type, values_from = mean_value) %>%
+  left_join(t_test_results, by = "quality_variable")
+
+# Print the summary table
+print(summary_table)
+```
+
+
+
+**2. By Gender**
+
+```{r}
+ggplot(your_data_long, aes(x = quality_variable, y = value, fill = as.factor(participant_gender))) +
+  geom_bar(stat = "summary", fun = "mean", position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of Means by Gender",
+       x = "Measures of Quality",
+       y = "Mean Value") +
+  scale_fill_manual(values = c("1" ="lightblue", "2" ="pink"), labels = c("Male", "Female")) +  # Adjust colors as needed
+  theme_minimal()+
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+# Perform t-tests for each quality variable
+t_test_results <- your_data_long %>%
+  group_by(quality_variable) %>%
+  summarise(p_value = t.test(value ~ participant_gender)$p.value)
+
+# Combine the results with the mean values
+summary_table <- your_data_long %>%
+  group_by(quality_variable, participant_gender) %>%
+  summarise(mean_value = mean(value)) %>%
+  pivot_wider(names_from = participant_gender, values_from = mean_value) %>%
+  left_join(t_test_results, by = "quality_variable")
+
+# Print the summary table
+print(summary_table)
+```
+
+
+**3. By Race**
+
+
+```{r}
+your_data_long <- your_data_long %>%
+  mutate(race_category = ifelse(race == 1, "White", "Non-White"))
+
+ggplot(your_data_long, aes(x = quality_variable, y = value, fill = race_category)) +
+  geom_bar(stat = "summary", fun = "mean", position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of Means by Race",
+       x = "Measures of Quality",
+       y = "Mean Value") +
+  scale_fill_manual(values = c("White" = "lightgrey", "Non-White" = "orange")) +
+  theme_minimal() +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+```{r}
+# Perform t-tests for each quality variable
+t_test_results <- your_data_long %>%
+  group_by(quality_variable) %>%
+  summarise(p_value = t.test(value ~ race_category)$p.value)
+
+# Combine the results with the mean values
+summary_table <- your_data_long %>%
+  group_by(quality_variable, race_category) %>%
+  summarise(mean_value = mean(value)) %>%
+  pivot_wider(names_from = race_category, values_from = mean_value) %>%
+  left_join(t_test_results, by = "quality_variable")
+
+# Print the summary table
+print(summary_table)
+```
+
+
+**4. By Education**
+
+
+```{r}
+your_data_long <- your_data_long %>%
+  mutate(education_category = ifelse(education_level >= 4, "College or Above", "Below College"))
+
+ggplot(your_data_long, aes(x = quality_variable, y = value, fill = education_category)) +
+  geom_bar(stat = "summary", fun = "mean", position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of Means by Education Level",
+       x = "Measures of Quality",
+       y = "Mean Value") +
+  scale_fill_manual(values = c("College or Above" = "violet", "Below College" = "lightblue")) +
+  theme_minimal() +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+```{r}
+# Perform t-tests for each quality variable
+t_test_results <- your_data_long %>%
+  group_by(quality_variable) %>%
+  summarise(p_value = t.test(value ~ education_category)$p.value)
+
+# Combine the results with the mean values
+summary_table <- your_data_long %>%
+  group_by(quality_variable, education_category) %>%
+  summarise(mean_value = mean(value)) %>%
+  pivot_wider(names_from = education_category, values_from = mean_value) %>%
+  left_join(t_test_results, by = "quality_variable")
+
+# Print the summary table
+print(summary_table)
+```
+
+
+**5. By Income**
+
+```{r}
+your_data_long <- your_data_long %>%
+  mutate(income_category = case_when(
+    income_level <= 4 ~ "Below $100k",
+    income_level > 4 ~ "Above $100k",
+    TRUE ~ NA_character_
+  ))
+
+ggplot(your_data_long, aes(x = quality_variable, y = value, fill = income_category)) +
+  geom_bar(stat = "summary", fun = "mean", position = position_dodge(width = 0.8)) +
+  labs(title = "Comparison of Means by Income Level",
+       x = "Measures of Quality",
+       y = "Mean Value") +
+  scale_fill_manual(values = c("Below $100k" = "lightblue", "Above $100k" = "lightcoral")) +
+  theme_minimal() +
+  theme(legend.title = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+# Perform t-tests for each quality variable
+t_test_results <- your_data_long %>%
+  group_by(quality_variable) %>%
+  summarise(p_value = t.test(value ~ income_category)$p.value)
+
+# Combine the results with the mean values
+summary_table <- your_data_long %>%
+  group_by(quality_variable, income_category) %>%
+  summarise(mean_value = mean(value)) %>%
+  pivot_wider(names_from = income_category, values_from = mean_value) %>%
+  left_join(t_test_results, by = "quality_variable")
+
+# Print the summary table
+print(summary_table)
+```
+
+
+### DISCUSSION 
+
+The findings of descriptive analyses of quality ratings reflect on various aspects of nursing home care, including accessibility, affordability, and overall received quality rating. In terms of a quality rating comparison, most of the factors analyzed held consistent between the years 2017 and 2019, averaging the most common answer of 8. The perceptions of care quality at nursing homes has revealed a prevailing sentiment of high satisfaction among residents and their families, suggesting a commendable level of service and care that resonates with the average population. As for the influence of demographics on quality ratings, our findings highlight two crucial factors: income and payment source. Notably, a direct correlation emerged between higher income and a private payment method, leading to elevated quality ratings. This underscores the importance of financial resources in shaping the perceived quality of care in nursing homes. The nuanced interplay between financial support and quality ratings underscores the need for a comprehensive approach to improve and maintain high standards of care, ensuring that all residents, regardless of their financial background, receive the best possible support and services.
+
+The interpretation of these results are contingent upon several limitations that we observed throughout our investigation and analysis of the data. Recognizing and acknowledging these limitations is crucial in understanding the scope of our findings and the extent to which they may be applied. One limitation that we identified was the scope of time between the two cohorts of data we chose; though regulatory changes and subsequent trends may have the possibility of showing significance, 2017 and 2019 are still very similar years. Choosing to study such similar years could have prevented us from finding long-term trends that reflect important changes in dynamics in nursing home care. Another limitation we noticed throughout our analysis was the inclusion of location where the nursing home resident was; having knowledge about the state where each participant was staying could allow us to derive valuable conclusions about regional and state-specific differences between provision of nursing home care. Another limitation worth noting is that the study was conducted as an online survey, introducing selection bias. People who chose to respond and participate in the study may have some distinct qualities or backgrounds that those who declined to participate/ignored may lack. This could affect the generalizability of this analysis’s findings to anyone in the United States that has within the last 6 months been, or know someone who has been, in a nursing home. 
+
+Though our findings provided some clarity into the structure of nursing home trends, a future research objective we’d have is to explore data pre-COVID-19, such as the 2017 or 2019 data, and compare it to data in the midst of COVID-19, such as 2020 or 2021 data, when policies and global health concerns were at their peak in terms of severity. The impact of the pandemic could have had a profound impact on nursing home care, not just in terms of the number of people residing there, but also the imminent changes in regulation that must be upheld, especially in an environment where residents are considered the most vulnerable population to contract the virus. This includes immediate mask policies, social distancing, visitation limitations, and reinforced infection control measures. The pandemic created a need for healthcare facilities especially to adapt quickly, as seamlessly as possible, and continuously, with every new update from the WHO (World Health Organization) or the CDC (Center for Disease Control and Prevention) being processed. Comparing such data would allow us to assess the impacts of such a global, external crisis on several factors, including general admission and stay length trends as well as financial and regulatory changes. The pandemic required reallocation of resources for these facilities, especially to make room for millions of masks and extra sanitization to be incorporated into daily lives. This, along with the increase in care for not only older and/or disabled individuals, but also people who may have compromised immune systems that the virus heavily targets, could affect the financial process of being admitted to a nursing home in the first place. How would this decrease in affordability affect the rate of admission and general satisfaction of residents, especially considering that the demand for such facilities has gone up? Measuring consumer/resident experiences would assess, compare, and contrast satisfaction and overall accommodation to the pandemic’s conditions between pre-pandemic years and amidst-pandemic years. Factors such as security ratings, quality of medical care, and quality of physical environment could be a few significant variables that would be interesting to look at. Future research in this direction could provide insight into how adaptable healthcare facilities in the healthcare system currently are and how they can be improved to better serve vulnerable populations. 
+
+### REFERENCES
+1. Caplan, Zoe. “U.S. Older Population Grew from 2010 to 2020 at Fastest Rate since 1880 to 1890.” Census.Gov, 25 May 2023, www.census.gov/library/stories/2023/05/2020-census-united-states-older-population-grew.html#:~:text=The%20U.S.%20population%20age%2065,the%20United%20States%20in%202020
+
+2. “Promoting Health for Older Adults.” Centers for Disease Control and Prevention, Centers for Disease Control and Prevention, 8 Sept. 2022, www.cdc.gov/chronicdisease/resources/publications/factsheets/promoting-health-for-older-adults.htm#:~:text=Aging%20increases%20the%20risk%20of,diabetes%2C%20arthritis%2C%20and%20cancer
+
+3. Jaul, Efraim, and Jeremy Barron. “Age-Related Diseases and Clinical and Public Health Implications for the 85 Years Old and over Population.” Frontiers in Public Health, U.S. National Library of Medicine, 11 Dec. 2017, www.ncbi.nlm.nih.gov/pmc/articles/PMC5732407/. 
+
+4. Breeding, Brad. “Confronting Our Nation’s Ever-Growing Long-Term Care Crisis.” myLifeSite, 3 Aug. 2023, mylifesite.net/blog/post/confronting-our-nations-long-term-care-crisis/#:~:text=More%20care%20recipients%20with%20fewer,in%20this%20country%20truly%20emerges. 
+
+5. Wang, Y., Zhang, Q., Spatz, E.S. et al. Persistent geographic variations in availability and quality of nursing home care in the United States: 1996 to 2016. BMC Geriatr 19, 103 (2019). https://doi.org/10.1186/s12877-019-1117-z
+
+6. Castle, N. G., & Ferguson, J. C. (2010, August 1). What is Nursing Home Quality and How Is It Measured?. Academic.oup.com. https://academic.oup.com/gerontologist/article/50/4/426/746285
+
+7. Castle, N. (2004, December 1). Family satisfaction with nursing home facility care. Academic.oup.com. https://academic.oup.com/intqhc/article/16/6/483/1805878
+
+8. MOR, V., ZINN, J., ANGELELLI, J., TENO, J.M. and MILLER, S.C. (2004), Driven to Tiers: Socioeconomic and Racial Disparities in the Quality of Nursing Home Care. The Milbank Quarterly, 82: 227-256. https://doi.org/10.1111/j.0887-378X.2004.00309.x
+
+
+
+
+
+
+
+
+
+
+
+
