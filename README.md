@@ -33,5 +33,7 @@ Challenges we currently face involve questions about the generalizeability of ou
 ## Instructions for Getting Started
 1. Clone this repository
 2. Download both "37969-0001-Data.csv" and "37969-0002-Data.csv". These are the two datasets we used for this project; the first is 2017 data and the second is 2019 data. 
-3. Download "EDA-Final.rmd" to view our analysis
+3. Download "EDA-FINAL.rmd" and "EDA-FINAL.html" to view our analysis
+4. View project Binder https://notebooks.gesis.org/binder/jupyter/user/aczhengg-eda-notebook-az-sz-qzhvy25o/lab
+
 
