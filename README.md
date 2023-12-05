@@ -32,6 +32,6 @@ Challenges we currently face involve questions about the generalizeability of ou
 
 ## Instructions for Getting Started
 1. Clone this repository
-2. Download both "ICPSR_37969 5/DS0001/37969-0001-Data.csv" and "ICPSR_37969 6/DS0002/37969-0002-Data.csv". These are the two datasets we used for this project; the first is 2017 data and the second is 2019 data. 
-3. Download "EDA Notebook Final" to view our analysis
+2. Download both "37969-0001-Data.csv" and "37969-0002-Data.csv". These are the two datasets we used for this project; the first is 2017 data and the second is 2019 data. 
+3. Download "EDA-Final.rmd" to view our analysis
 
