@@ -6,6 +6,13 @@ This analysis is by Stella Zhang and Ali Zheng, seniors at Emory University stud
 
 This project studies the relationships and trends between US nursing home care quality, payment methods for nursing home care, population demographics, and participant income level. 
 
+Objective 1: 
+How do residents and family members perceive care quality at nursing homes?
+
+Objective 2: 
+How does financial support across facilities affect quality ratings?
+
+
 ## Methods Used
 - Data Visualization (variety of graphs)
 - Statistical Significance Testing (p-values)
